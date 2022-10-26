@@ -15,9 +15,100 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(home: MyStatefulWidget());
+    return MaterialApp(
+      initialRoute: '/',
+      routes: <String, WidgetBuilder>{
+        '/': (BuildContext context) => const Home(),
+        '/rest': (BuildContext context) => const MyStatefulWidget(),
+      },
+    );
   }
 }
+
+class Home extends StatefulWidget {
+  const Home({Key? key}) : super(key: key);
+
+  @override
+  State<Home> createState() => _HomeState();
+}
+
+class _HomeState extends State<Home> {
+
+  Widget body = Text("meow");
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("rest"),
+      ),
+      body: Center(
+        child: Container(child: body,),
+      ),
+      drawer: Drawer(
+        child: ListView(
+          children: <Widget>[
+            Container(child: DrawerHeader(child: Container(),),),
+            Container(
+              child: Column(
+                children: <Widget>[
+                  ListTile(
+                    title: Text("Rest"),
+                    leading: Icon(Icons.api),
+                    onTap: () {
+                      setState(() {
+                        Navigator.pop(context);
+                        body = MyStatefulWidget();
+                      });
+                    },
+                  ),
+                  ListTile(
+                    title: Text("Another"),
+                    leading: Icon(Icons.hourglass_full),
+                    onTap: () {
+                      setState(() {
+                        Navigator.pop(context);
+                        body = Text("space");
+                      });
+                    },
+                  )
+                ],
+              ),
+            )
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget buildHeader(BuildContext context) => Container(
+    padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
+  );
+
+  Widget buildItems(BuildContext context) => Column(
+    children: [
+      ListTile(
+        title: Text("Rest"),
+        leading: Icon(Icons.api),
+        onTap: () {
+          setState(() {
+            body = ListTile();
+          });
+        },
+      ),
+      ListTile(
+        title: Text("Another"),
+        leading: Icon(Icons.hourglass_full),
+        onTap: () {
+          setState(() {
+            body = HullBlocks();
+          });
+        },
+      )
+    ],
+  );
+}
+
 
 class MyStatefulWidget extends StatefulWidget {
   const MyStatefulWidget({Key? key}) : super(key: key);
@@ -42,9 +133,6 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("rest"),
-      ),
       body: Center(
         child: _widgetOptions.elementAt(_selectedIndex),
       ),
@@ -65,6 +153,47 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
       ),
     );
   }
+}
+
+class NavigationDrawer extends StatelessWidget {
+  const NavigationDrawer({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Drawer(
+      child: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: <Widget>[buildHeader(context), buildItems(context)],
+        ),
+      ),
+    );
+  }
+
+  Widget buildHeader(BuildContext context) => Container(
+        padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
+      );
+
+  Widget buildItems(BuildContext context) => Column(
+        children: [
+          ListTile(
+            title: Text("Rest"),
+            leading: Icon(Icons.api),
+            onTap: () {
+
+            },
+          ),
+          ListTile(
+            title: Text("Another"),
+            leading: Icon(Icons.hourglass_full),
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.of(context).pushReplacement(
+                  MaterialPageRoute(builder: (context) => const HullBlocks()));
+            },
+          )
+        ],
+      );
 }
 
 class ListElements extends StatefulWidget {
@@ -186,8 +315,7 @@ class _HullBlocksState extends State<HullBlocks> {
         margin: EdgeInsets.symmetric(vertical: 4),
         padding: EdgeInsets.symmetric(vertical: 8),
         color: index == selectedIndex ? Colors.black12 : Colors.white60,
-        child: Text(futureCode[index].code,
-            style: TextStyle(fontSize: 24)),
+        child: Text(futureCode[index].code, style: TextStyle(fontSize: 24)),
       ),
     );
   }
